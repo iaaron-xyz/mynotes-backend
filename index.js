@@ -19,14 +19,24 @@ let notes = [
   },
 ];
 
+app.use(express.json());
+
+const generateId = () => {
+  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
+  return maxId + 1;
+};
+
+// Get homepage
 app.get("/", (request, response) => {
   response.send("<h1>Hello Express World!</h1>");
 });
 
+// Get all notes
 app.get("/api/notes", (request, response) => {
   response.json(notes);
 });
 
+// Get one note
 app.get("/api/notes/:id", (request, response) => {
   const id = Number(request.params.id);
   const note = notes.find((note) => note.id === id);
@@ -38,12 +48,37 @@ app.get("/api/notes/:id", (request, response) => {
   }
 });
 
+// delete one note
 app.delete("/api/notes/:id", (request, response) => {
   const id = Number(request.params.id);
   notes = notes.filter((note) => note.id !== id);
   response.status(204).end();
 });
 
+// Post a new note
+app.post("/api/notes", (request, response) => {
+  // Get the data body
+  const body = request.body;
+  console.log("Note body", body);
+  // If the content is empty
+  if (!body.content) {
+    return response.status(400).json({
+      error: "content missing",
+    });
+  }
+  // create new note object
+  const newNote = {
+    content: body.content,
+    important: Boolean(body.important) || false,
+    id: generateId(),
+  };
+  notes = notes.concat(newNote);
+  console.log("Notes updated:", notes);
+
+  response.json(newNote);
+});
+
+// Activate server
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port http://localhost:${PORT}`);
