@@ -35,6 +35,8 @@ const requestLogger = (request, response, next) => {
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
+// fetch static files
+app.use(express.static("dist"));
 
 const generateId = () => {
   const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
@@ -102,5 +104,5 @@ app.use(unknownEndpoint);
 // Activate server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on port http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
