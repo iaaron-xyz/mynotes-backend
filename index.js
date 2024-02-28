@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 
 let notes = [
@@ -19,7 +20,21 @@ let notes = [
   },
 ];
 
+// DEFINE MIDDLEWARE FUNCTIONS
+
+// Prints information about every request
+const requestLogger = (request, response, next) => {
+  console.log("Method:", request.method);
+  console.log("Path: ", request.path);
+  console.log("Body: ", request.body);
+  console.log("---");
+  next();
+};
+
+// CALL MIDDLEWARES
 app.use(express.json());
+app.use(cors());
+app.use(requestLogger);
 
 const generateId = () => {
   const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
@@ -78,8 +93,14 @@ app.post("/api/notes", (request, response) => {
   response.json(newNote);
 });
 
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
 // Activate server
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port http://localhost:${PORT}`);
 });
