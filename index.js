@@ -1,24 +1,27 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const mongoose = require("mongoose");
 
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    important: true,
-  },
-  {
-    id: 2,
-    content: "Browser can execute only JavaScript",
-    important: false,
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    important: true,
-  },
-];
+// get the password from the command line, second argument
+console.log(`PROCESS: ${process.argv}`);
+console.log("--------------------------------------");
+const password = process.argv[2];
+
+// generate the url with the password
+const url = `mongodb+srv://iarnfso:${password}@cluster0.wslzans.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0`;
+
+// mongo connection paramters
+mongoose.set("strictQuery", false);
+mongoose.connect(url);
+
+// define the base schema for the database
+const noteSchema = new mongoose.Schema({
+  content: String,
+  important: Boolean,
+});
+
+const Note = mongoose.model("Note", noteSchema);
 
 // DEFINE MIDDLEWARE FUNCTIONS
 
@@ -43,14 +46,27 @@ const generateId = () => {
   return maxId + 1;
 };
 
+// transform the returned object data from mongodb
+noteSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    // create a copy of _id field in string format
+    returnedObject.id = returnedObject._id.toString();
+    // delete object fields
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
 // Get homepage
 app.get("/", (request, response) => {
   response.send("<h1>Hello Express World!</h1>");
 });
 
-// Get all notes
+// Get all notes from mongo database
 app.get("/api/notes", (request, response) => {
-  response.json(notes);
+  Note.find({}).then((notes) => {
+    response.json(notes);
+  });
 });
 
 // Get one note
