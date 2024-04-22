@@ -2,26 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
-
-// get the password from the command line, second argument
-console.log(`PROCESS: ${process.argv}`);
-console.log("--------------------------------------");
-const password = process.argv[2];
-
-// generate the url with the password
-const url = `mongodb+srv://iarnfso:${password}@cluster0.wslzans.mongodb.net/noteApp?retryWrites=true&w=majority&appName=Cluster0`;
-
-// mongo connection paramters
-mongoose.set("strictQuery", false);
-mongoose.connect(url);
-
-// define the base schema for the database
-const noteSchema = new mongoose.Schema({
-  content: String,
-  important: Boolean,
-});
-
-const Note = mongoose.model("Note", noteSchema);
+require("dotenv").config();
+const Note = require("./models/note");
 
 // DEFINE MIDDLEWARE FUNCTIONS
 
@@ -45,17 +27,6 @@ const generateId = () => {
   const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
   return maxId + 1;
 };
-
-// transform the returned object data from mongodb
-noteSchema.set("toJSON", {
-  transform: (document, returnedObject) => {
-    // create a copy of _id field in string format
-    returnedObject.id = returnedObject._id.toString();
-    // delete object fields
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
 
 // Get homepage
 app.get("/", (request, response) => {
