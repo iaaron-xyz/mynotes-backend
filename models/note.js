@@ -7,7 +7,7 @@ mongoose.set("strictQuery", false);
 const url = process.env.MONGODB_URI;
 
 // user feecback about the connection status
-console.log("connecting to", url);
+console.log("connecting to", url.slice(0, 20), "...");
 
 mongoose
   .connect(url)

@@ -5,8 +5,6 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const Note = require("./models/note");
 
-// DEFINE MIDDLEWARE FUNCTIONS
-
 // Prints information about every request
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
@@ -59,27 +57,29 @@ app.delete("/api/notes/:id", (request, response) => {
   response.status(204).end();
 });
 
-// Post a new note
+// Save a new note to mongo DB
 app.post("/api/notes", (request, response) => {
-  // Get the data body
+  // Get the data body from the frontend
   const body = request.body;
   console.log("Note body", body);
-  // If the content is empty
-  if (!body.content) {
+
+  // No content
+  if (!body.content === undefined) {
     return response.status(400).json({
       error: "content missing",
     });
   }
+
   // create new note object
-  const newNote = {
+  const newNote = new Note({
     content: body.content,
     important: Boolean(body.important) || false,
-    id: generateId(),
-  };
-  notes = notes.concat(newNote);
-  console.log("Notes updated:", notes);
+  });
 
-  response.json(newNote);
+  // save the note to the db
+  newNote.save().then((savedNote) => {
+    response.json(savedNote);
+  });
 });
 
 const unknownEndpoint = (request, response) => {
