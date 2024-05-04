@@ -38,16 +38,21 @@ app.get("/api/notes", (request, response) => {
   });
 });
 
-// Get one note
+// Get a single note from the Mongo DB
 app.get("/api/notes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const note = notes.find((note) => note.id === id);
+  const id = request.params.id;
 
-  if (note) {
+  Note.findById(id).then((note) => {
+    // note with null value
+    if (note === null) {
+      return response.status(400).json({
+        error: "content missing",
+      });
+    }
+
+    //  return the note in JSON format
     response.json(note);
-  } else {
-    response.status(404).end();
-  }
+  });
 });
 
 // delete one note
