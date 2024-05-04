@@ -9,6 +9,7 @@
     "build:ui": "rm -rf dist && cd ../notes-frontend && npm run build && cp -r dist ../notes-backend",
     "build:uiwin": "@powershell Remove-Item -Recurse -Force dist && cd ../notes-frontend && npm run build && @powershell Copy-Item dist -Recurse ../notes-backend",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "deploy:fullwin": "npm run build:uiwin && git add . && git commit -m uibuild && git push",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Aaron",
