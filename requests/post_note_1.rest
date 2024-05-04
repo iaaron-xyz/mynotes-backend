@@ -1,0 +1,7 @@
+POST http://localhost:3001/api/notes/
+Content-Type: application/json
+
+{
+    "content": "Testing: Correct POST to the DB",
+    "important": true
+}
