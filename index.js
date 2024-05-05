@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const mongoose = require("mongoose");
+
 require("dotenv").config();
 const Note = require("./models/note");
 
@@ -14,12 +14,21 @@ const requestLogger = (request, response, next) => {
   next();
 };
 
+// Error handler
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+  // Error related to malformatted ids
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "wrong format id" });
+  }
+  next(error);
+};
+
 // CALL MIDDLEWARES
+app.use(express.static("dist"));
 app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
-// fetch static files
-app.use(express.static("dist"));
 
 const generateId = () => {
   const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
@@ -39,7 +48,7 @@ app.get("/api/notes", (request, response) => {
 });
 
 // Get a single note from the Mongo DB
-app.get("/api/notes/:id", (request, response) => {
+app.get("/api/notes/:id", (request, response, next) => {
   const id = request.params.id;
 
   Note.findById(id)
@@ -51,11 +60,7 @@ app.get("/api/notes/:id", (request, response) => {
       //  return the note in JSON format
       response.json(note);
     })
-    .catch((error) => {
-      // Bad request
-      console.log(error);
-      response.status(400).send({ error: "malformatted id" });
-    });
+    .catch((error) => next(error));
 });
 
 // delete one note
@@ -94,7 +99,8 @@ const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
 
-app.use(unknownEndpoint);
+app.use(unknownEndpoint); // wrong urls
+app.use(errorHandler); // MIDDLEWARE to handle errors in requests
 
 // Activate server
 const PORT = process.env.PORT || 3001;
