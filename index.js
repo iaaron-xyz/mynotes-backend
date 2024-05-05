@@ -63,13 +63,6 @@ app.get("/api/notes/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
-// delete one note
-app.delete("/api/notes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  notes = notes.filter((note) => note.id !== id);
-  response.status(204).end();
-});
-
 // Save a new note to mongo DB
 app.post("/api/notes", (request, response) => {
   // Get the data body from the frontend
@@ -93,6 +86,13 @@ app.post("/api/notes", (request, response) => {
   newNote.save().then((savedNote) => {
     response.json(savedNote);
   });
+});
+
+// delete one note
+app.delete("/api/notes/:id", (request, response) => {
+  const id = Number(request.params.id);
+  notes = notes.filter((note) => note.id !== id);
+  response.status(204).end();
 });
 
 const unknownEndpoint = (request, response) => {
