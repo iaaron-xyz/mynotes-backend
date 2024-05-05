@@ -89,10 +89,16 @@ app.post("/api/notes", (request, response) => {
 });
 
 // delete one note
-app.delete("/api/notes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  notes = notes.filter((note) => note.id !== id);
-  response.status(204).end();
+app.delete("/api/notes/:id", (request, response, next) => {
+  const id = request.params.id;
+  console.log(id);
+
+  Note.findByIdAndDelete(id)
+    .then((result) => {
+      console.log(result);
+      response.status(204).end();
+    })
+    .catch((error) => next(error));
 });
 
 const unknownEndpoint = (request, response) => {
