@@ -1,0 +1,7 @@
+PUT http://localhost:3001/api/notes/65dfa89f064dc904ef42100b
+Content-Type: application/json
+
+{
+    "content": "Setup MongoDB correctly",
+    "important": false
+}

@@ -95,8 +95,27 @@ app.delete("/api/notes/:id", (request, response, next) => {
 
   Note.findByIdAndDelete(id)
     .then((result) => {
-      console.log(result);
+      console.log("DELETE RESULT:", result);
       response.status(204).end();
+    })
+    .catch((error) => next(error));
+});
+
+// Modify/Update a form
+app.put("/api/notes/:id", (request, response, next) => {
+  const body = request.body;
+  const id = request.params.id;
+
+  // note updated info
+  const updatedContent = {
+    content: body.content,
+    important: body.important,
+  };
+
+  // find note with given id and update with the new content
+  Note.findByIdAndUpdate(id, updatedContent, { new: updatedContent })
+    .then((updatedNote) => {
+      response.json(updatedNote);
     })
     .catch((error) => next(error));
 });
