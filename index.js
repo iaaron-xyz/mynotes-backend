@@ -42,17 +42,20 @@ app.get("/api/notes", (request, response) => {
 app.get("/api/notes/:id", (request, response) => {
   const id = request.params.id;
 
-  Note.findById(id).then((note) => {
-    // note with null value
-    if (note === null) {
-      return response.status(400).json({
-        error: "content missing",
-      });
-    }
-
-    //  return the note in JSON format
-    response.json(note);
-  });
+  Note.findById(id)
+    .then((note) => {
+      // note with null value
+      if (note === null) {
+        return response.status(404).end();
+      }
+      //  return the note in JSON format
+      response.json(note);
+    })
+    .catch((error) => {
+      // Bad request
+      console.log(error);
+      response.status(400).send({ error: "malformatted id" });
+    });
 });
 
 // delete one note
