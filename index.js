@@ -20,6 +20,8 @@ const errorHandler = (error, request, response, next) => {
   // Error related to malformatted ids
   if (error.name === "CastError") {
     return response.status(400).send({ error: "wrong format id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
   next(error);
 };
@@ -64,7 +66,7 @@ app.get("/api/notes/:id", (request, response, next) => {
 });
 
 // Save a new note to mongo DB
-app.post("/api/notes", (request, response) => {
+app.post("/api/notes", (request, response, next) => {
   // Get the data body from the frontend
   const body = request.body;
   console.log("Note body", body);
@@ -83,9 +85,12 @@ app.post("/api/notes", (request, response) => {
   });
 
   // save the note to the db
-  newNote.save().then((savedNote) => {
-    response.json(savedNote);
-  });
+  newNote
+    .save()
+    .then((savedNote) => {
+      response.json(savedNote);
+    })
+    .catch((error) => next(error));
 });
 
 // delete one note
@@ -103,17 +108,15 @@ app.delete("/api/notes/:id", (request, response, next) => {
 
 // Modify/Update a form
 app.put("/api/notes/:id", (request, response, next) => {
-  const body = request.body;
+  const { content, important } = request.body;
   const id = request.params.id;
 
-  // note updated info
-  const updatedContent = {
-    content: body.content,
-    important: body.important,
-  };
-
   // find note with given id and update with the new content
-  Note.findByIdAndUpdate(id, updatedContent, { new: updatedContent })
+  Note.findByIdAndUpdate(
+    id,
+    { content, important },
+    { new: true, runValidators: true, context: "query" }
+  )
     .then((updatedNote) => {
       response.json(updatedNote);
     })

@@ -20,7 +20,12 @@ mongoose
 
 // define the base schema for the database
 const noteSchema = new mongoose.Schema({
-  content: String,
+  content: {
+    type: String,
+    minLength: [5, "Minimum length allowed is of 5 characters."],
+    maxLength: 200,
+    required: [true, "You must write a note."],
+  },
   important: Boolean,
 });
 
