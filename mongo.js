@@ -35,15 +35,7 @@ const note = new Note({
 
 // Save the document, print to console the note is saved
 // and close the connection
-note.save().then((result) => {
+note.save().then(() => {
   console.log("note saved!");
   mongoose.connection.close();
 });
-
-// Fetch data
-// Note.find({}).then((result) => {
-//   result.forEach((note) => {
-//     console.log(note);
-//   });
-//   mongoose.connection.close();
-// });

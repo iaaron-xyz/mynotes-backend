@@ -11,7 +11,7 @@ console.log("connecting to", url.slice(0, 20), "...");
 
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log("connected to MongoDB");
   })
   .catch((error) => {

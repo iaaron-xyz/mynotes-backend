@@ -32,11 +32,6 @@ app.use(express.json());
 app.use(cors());
 app.use(requestLogger);
 
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
-
 // Get homepage
 app.get("/", (request, response) => {
   response.send("<h1>Hello Express World!</h1>");
@@ -72,7 +67,7 @@ app.post("/api/notes", (request, response, next) => {
   console.log("Note body", body);
 
   // No content
-  if (!body.content === undefined) {
+  if (body.content === undefined) {
     return response.status(400).json({
       error: "content missing",
     });
