@@ -1,23 +1,5 @@
 const mongoose = require("mongoose");
 
-// mongo connection paramters
-mongoose.set("strictQuery", false);
-
-// generate the url with the password
-const url = process.env.MONGODB_URI;
-
-// user feecback about the connection status
-console.log("connecting to", url.slice(0, 20), "...");
-
-mongoose
-  .connect(url)
-  .then(() => {
-    console.log("connected to MongoDB");
-  })
-  .catch((error) => {
-    console.log("error connecting to MongoDB:", error.message);
-  });
-
 // define the base schema for the database
 const noteSchema = new mongoose.Schema({
   content: {
